@@ -32,11 +32,10 @@ typedef struct smContext {
 	int *pList;
 	} * SMX;
 
-#define PQ_STATIC	PQ *PQ_t,*PQ_lt;int PQ_j,PQ_i
-
 
 #define PQ_INIT(pq,n)\
 {\
+	int PQ_j;\
 	for (PQ_j=0;PQ_j<(n);++PQ_j) {\
 		if (PQ_j < 2) (pq)[PQ_j].pqFromInt = NULL;\
 		else (pq)[PQ_j].pqFromInt = &(pq)[PQ_j>>1];\
@@ -47,6 +46,7 @@ typedef struct smContext {
 
 #define PQ_BUILD(pq,n,q)\
 {\
+	int PQ_i,PQ_j;PQ *PQ_t,*PQ_lt;\
 	for (PQ_j=(n)-1;PQ_j>0;--PQ_j) {\
 		PQ_i = (PQ_j<<1);\
 		if (PQ_i < (n)) PQ_t = (pq)[PQ_i].pqWinner;\
@@ -69,6 +69,7 @@ typedef struct smContext {
 
 #define PQ_REPLACE(q)\
 {\
+	PQ *PQ_t,*PQ_lt;\
 	PQ_t = (q)->pqFromExt;\
 	while (PQ_t) {\
 		if (PQ_t->pqLoser->fKey > (q)->fKey) {\

@@ -9,7 +9,6 @@
 int smInit(SMX *psmx,KD kd,int nSmooth,float *fPeriod)
 {
 	SMX smx;
-	PQ_STATIC;
 	int pi,j;
 
 	assert(nSmooth <= kd->nActive);
@@ -62,7 +61,6 @@ void smBallSearch(SMX smx,float fBall2,float *ri)
 	int cell,cp,ct,pj;
 	float fDist2,dx,dy,dz,lx,ly,lz,sx,sy,sz,x,y,z;
 	PQ *pq;
-	PQ_STATIC;
 
 	c = smx->kd->kdNodes;
 	p = smx->kd->p;
@@ -199,7 +197,6 @@ void smSmooth(SMX smx,void (*fncSmooth)(SMX,int,int,int *,float *))
 	KDN *c;
 	PARTICLE *p;
     PQ *pq,*pqLast;
-	PQ_STATIC;
 	int cell;
 	int pi,pin,pj,pNext,nCnt,nSmooth;
 	float dx,dy,dz,x,y,z,h2,ax,ay,az;
