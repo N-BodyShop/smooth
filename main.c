@@ -17,7 +17,7 @@ void usage(void)
 	fprintf(stderr,"smooth [-s <nSmooth>[dgs]] [-b <nBucket>] [-g]\n");
 	fprintf(stderr,"   [-o <Output Name>] [-p <xyzPeriod>]\n");
 	fprintf(stderr,"   [-px <xPeriod>] [-py <yPeriod>] [-pz <zPeriod>]\n");
-	fprintf(stderr,"   [-do <MarkFile>]\n");
+	fprintf(stderr,"   [-do <MarkFile>] [-nat]\n");
 	fprintf(stderr,"   [density] [meanvel] [speed] [veldisp] [mach]\n");
 	fprintf(stderr,"   [phase] [hsmooth] [divv] [all] [null]\n\n");
 	fprintf(stderr,"Input taken from stdin in tipsy binary format.\n");
@@ -36,10 +36,11 @@ int main(int argc,char **argv)
 	int bDensity,bMeanVel,bVelDisp,bPhase,bMach,bSpeed,bNull,bSym;
 	int bHsmooth;
 	int bDark,bGas,bStar;
-	int bMark;
+	int bMark,bNative;
 	int bDivv;
 	char *p,*q;
 	
+	printf("SMOOTH v2.3: Joachim Stadel, Apr. 1999\n");
    	nBucket = 16;
 	nSmooth = 64;
 	bDensity = 0;
@@ -56,6 +57,7 @@ int main(int argc,char **argv)
 	bGas = 1;
 	bStar = 1;
 	bMark = 0;
+	bNative = 0;
 	strcpy(achFile,"smooth");
 	i = 1;
 	for (j=0;j<3;++j) fPeriod[j] = BIGNOTQUITEMAXFLOAT;
@@ -113,6 +115,10 @@ int main(int argc,char **argv)
 			}
 		else if (!strcmp(argv[i],"-g")) {
 			bSym = 0;
+			++i;
+			}
+		else if (!strcmp(argv[i],"-nat")) {
+			bNative = 1;
 			++i;
 			}
 		else if (!strcmp(argv[i],"-p")) {
@@ -205,27 +211,21 @@ int main(int argc,char **argv)
 		else usage();
 		}
 	kdInit(&kd,nBucket);
-	kdReadTipsy(kd,stdin,bDark,bGas,bStar);
+	kdReadTipsy(kd,stdin,bNative,bDark,bGas,bStar);
 	if (bMark) kdInMark(kd,achMark);
 	kdBuildTree(kd);
 	smInit(&smx,kd,nSmooth,fPeriod);
-	if (bNull&1) {
+	if ((bNull&1) && !(bDensity&1)) {
 		smSmooth(smx,smNull);
 		}
 	if (bSym) {
-		if (bDensity&1) {
-			if (bNull&1) smReSmooth(smx,smDensitySym);
-			else smSmooth(smx,smDensitySym);
-			}
+		if (bDensity&1) smSmooth(smx,smDensitySym);
 		if (bMeanVel&1) smReSmooth(smx,smMeanVelSym);
 		if (bDivv&1) smReSmooth(smx,smDivvSym);
 		if (bVelDisp&1) smReSmooth(smx,smVelDispNBSym);
 		}
 	else {
-		if (bDensity&1) {
-			if (bNull&1) smReSmooth(smx,smDensity);
-			else smSmooth(smx,smDensity);
-			}
+		if (bDensity&1) smSmooth(smx,smDensity);
 		if (bMeanVel&1) smReSmooth(smx,smMeanVel);
 		if (bDivv&1) smReSmooth(smx,smDivv);
 		if (bVelDisp&1) smReSmooth(smx,smVelDispNB);

@@ -1,19 +1,17 @@
 
+                              SMOOTH V2.3
 
-						SMOOTH V2.1 
+               A Smoothing Program for N-body Simulations
 
-		A Smoothing Program for N-body Simulations
+                       Joachim Stadel, April 1999
 
-						OCT 11, 1994
-
-CHANGES from V2.0:
-	* Support for mark arrays added.
-	* MAXFLOAT changed to HUGE, to comply with newer math.h
-
+CHANGES from v2.2:
+    * XDR standard tipsy binary files are now the default.
+      You can still use native files with the -nat option, although
+      we are phasing the use of native binary files out completely.
 
 Included are:
 	Makefile
-	cat1/smooth.1
 	kd.c
 	kd.h
 	main.c
@@ -22,8 +20,7 @@ Included are:
 	smooth.h
 	tipsydefs.h
 
-For detailed information read the man page (either cat1/smooth.1 or
-man1/smooth.1).
+For detailed information read the man page (man1/smooth.1).
 
 To build:
 
@@ -31,7 +28,7 @@ To build:
 
 To get further information contact:
 
-	hpccsoft@astro.washington.edu
+	stadel@astro.washington.edu
 
 
 

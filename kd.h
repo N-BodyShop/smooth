@@ -159,7 +159,7 @@ typedef struct kdContext {
 
 void kdTime(KD,int *,int *);
 int kdInit(KD *,int);
-int kdReadTipsy(KD,FILE *,int,int,int);
+int kdReadTipsy(KD,FILE *,int,int,int,int);
 void kdInMark(KD,char *);
 void kdBuildTree(KD);
 void kdOrder(KD);
