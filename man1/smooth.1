@@ -1,4 +1,4 @@
-.TH SMOOTH 2.2 "30 MARCH 1997" "Stadel Release 2.2   " "SMOOTH"
+.TH SMOOTH 2.3 "19 APRIL 1999" "Stadel Release 2.3" "SMOOTH"
 .SH NAME
 .B smooth
 \- Calculate smoothed quantities over all particles
@@ -10,14 +10,14 @@
 .br
 	[\-px <xPeriod>] [\-py <yPeriod>] [\-pz <zPeriod>]
 .br
-	[\-do <MarkFile>]
+	[\-do <MarkFile>] [\-nat]
 .br
 	[density] [meanvel] [speed] [veldisp] [phase] [mach]
 .br
-	[all] [null]
+	[hsmooth] [divv] [all] [null]
 .br
 .br
-Reads particles from stdin in the TIPSY BINARY format.
+Reads particles from stdin in the RPC Standard TIPSY BINARY format.
 
 .SH OPTIONS
 .B [\-s <nSmooth>[dgs]]:
@@ -68,7 +68,7 @@ x\-dimension given by the period <xPeriod>.
 .B [\-py <yPeriod>] [\-pz <zPeriod>]:
 As above.
 
-.B [\-do <Markfile>]
+.B [\-do <Markfile>]:
 .br
 Specifies that smooth should calculate mean field quantities only
 for those particles "marked" in the <MarkFile>. The MarkFile is in 
@@ -83,6 +83,12 @@ when, for example, a fast density calculation is required for a small
 subset of particles in a large simulation. Such a subset could be 
 found with a group finder (see FOF and DENMAX) or from a minimum
 density cut.
+
+.B [\-nat]:
+.br
+Read the input TIPSY binary file in Native binary format as opposed
+to using the RPC Standard TIPSY binary format. This is to provide 
+backward compatibility and is not recommended for general use.
 
 .B [density]:
 produces a density output file (smooth.den) in tipsy
@@ -107,6 +113,15 @@ tipsy array format
 .B [phase]:
 produces a phase density output file (smooth.phs) in
 tipsy array format
+
+.B [hsmooth]:
+produces a smoothing radius output file (smooth.hsm) in
+tipsy array format. Note that the radius is half of that 
+which contains all of the neighbors.
+
+.B [divv]:
+produces a divergence of velovity output file (smooth.dvv) in
+tipsy array format.
 
 .B [all]:
 produces all of the above output files
@@ -208,7 +223,7 @@ Make sure that sufficient disk space is available. When running smooth
 on several input files make sure to specify unique output names for the
 files otherwise these files will simply be over\-written.
 
-Smoothing time scales slightly worse than linear with number of particles
+Smoothing\-time scales slightly worse than linear with number of particles
 and linear with nSmooth (number of nearest neighbors).
 
 .SH BUGS
@@ -216,7 +231,7 @@ and linear with nSmooth (number of nearest neighbors).
 Bugs? Not!
 
 .SH SEE ALSO
-.B tipsy(1), skid(1), fof(1)
+.B tipsy(1), skid(1), fof(1), beam(1)
 
 
 
