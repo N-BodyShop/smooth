@@ -1,7 +1,7 @@
 
 
 
-SMOOTH(2.1)                  SMOOTH                   SMOOTH(2.1)
+SMOOTH(2.2)                  SMOOTH                   SMOOTH(2.2)
 
 
 
@@ -60,14 +60,14 @@ OPTIONS
 
 
 
-Stadel Release 2.1 Last change: 11 OCTOBER 1994                 1
+Stadel Release 2.2  Last change: 30 MARCH 1997                  1
 
 
 
 
 
 
-SMOOTH(2.1)                  SMOOTH                   SMOOTH(2.1)
+SMOOTH(2.2)                  SMOOTH                   SMOOTH(2.2)
 
 
 
@@ -126,14 +126,14 @@ DESCRIPTION
 
 
 
-Stadel Release 2.1 Last change: 11 OCTOBER 1994                 2
+Stadel Release 2.2  Last change: 30 MARCH 1997                  2
 
 
 
 
 
 
-SMOOTH(2.1)                  SMOOTH                   SMOOTH(2.1)
+SMOOTH(2.2)                  SMOOTH                   SMOOTH(2.2)
 
 
 
@@ -192,14 +192,14 @@ EXAMPLES
 
 
 
-Stadel Release 2.1 Last change: 11 OCTOBER 1994                 3
+Stadel Release 2.2  Last change: 30 MARCH 1997                  3
 
 
 
 
 
 
-SMOOTH(2.1)                  SMOOTH                   SMOOTH(2.1)
+SMOOTH(2.2)                  SMOOTH                   SMOOTH(2.2)
 
 
 
@@ -220,7 +220,12 @@ NOTE ABOUT OUTPUT
 WARNINGS
      When using periodic  boundary  conditions  assure  that  the
      periodicity  is  identical  to  that  used during the N-Body
-     simulation which generated the input file being used.
+     simulation which generated the input  file  being  used.  It
+     should  be stated that the code assumes all particle coordi-
+     nates to have  been  folded  into  some  cube  [x0,  x0+px[,
+     [y0,y0+py[,  ...  This  may  be a problem for the outputs of
+     some GRID CODES! Make sure your particles  are  folded  into
+     your volume!
 
      Smooth output files can be quite large  since  they  are  in
      ascii  format.   Make  sure  that  sufficient  disk space is
@@ -253,12 +258,7 @@ SEE ALSO
 
 
 
-
-
-
-
-
-Stadel Release 2.1 Last change: 11 OCTOBER 1994                 4
+Stadel Release 2.2  Last change: 30 MARCH 1997                  4
 
 
 

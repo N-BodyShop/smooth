@@ -1,4 +1,4 @@
-.TH SMOOTH 2.1 "11 OCTOBER 1994" "Stadel Release 2.1   " "SMOOTH"
+.TH SMOOTH 2.2 "30 MARCH 1997" "Stadel Release 2.2   " "SMOOTH"
 .SH NAME
 .B smooth
 \- Calculate smoothed quantities over all particles
@@ -198,7 +198,10 @@ vector format.
 
 When using periodic boundary conditions assure that the periodicity is 
 identical to that used during the N-Body simulation which generated the
-input file being used.
+input file being used. It should be stated that the code assumes 
+all particle coordinates to have been folded into some cube 
+[x0, x0+px[, [y0,y0+py[, ... This may be a problem for the outputs of
+some GRID CODES! Make sure your particles are folded into your volume!
 
 Smooth output files can be quite large since they are in ascii format.
 Make sure that sufficient disk space is available. When running smooth
