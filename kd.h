@@ -24,7 +24,7 @@ typedef struct Particle {
 	int iMark;
 	float fDensity;
 	float vMean[3];
-	float fVelDisp2;
+	float fVel2;
 	} PARTICLE;
 
 typedef struct bndBound {
