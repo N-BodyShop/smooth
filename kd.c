@@ -165,7 +165,7 @@ int kdReadTipsy(KD kd,FILE *fp,int bNative,int bDark,int bGas,int bStar)
 			}
 		}
 	for (i=0;i<h.ndark;++i) {
-		if (bNative) fread(&dp,sizeof(struct dark_particle),1,fp);
+		if (bNative) ret = fread(&dp,sizeof(struct dark_particle),1,fp);
 		else ret = xdr_dark(&xdr,&dp);
 		if (ret != 1) {
 			fprintf(stderr,"Error reading dark particle from input file.\n");
@@ -182,7 +182,7 @@ int kdReadTipsy(KD kd,FILE *fp,int bNative,int bDark,int bGas,int bStar)
 			}
 		}
 	for (i=0;i<h.nstar;++i) {
-		if (bNative) fread(&sp,sizeof(struct star_particle),1,fp);
+		if (bNative) ret = fread(&sp,sizeof(struct star_particle),1,fp);
 		else ret = xdr_star(&xdr,&sp);
 		if (ret != 1) {
 			fprintf(stderr,"Error reading star particle from input file.\n");
