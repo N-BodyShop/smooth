@@ -414,7 +414,7 @@ void smMeanVel(SMX smx,int pi,int nSmooth,int *pList,float *fList)
 	int i,j,pj;
 
 	ih2 = 4.0/smx->pfBall2[pi];
-	fNorm = M_1_PI*sqrt(ih2)*ih2/smx->kd->p[pi].fDensity;
+	fNorm = M_1_PI*sqrt(ih2)*ih2;
 	for (i=0;i<nSmooth;++i) {
 		pj = smx->pList[i];
 		r2 = smx->fList[i]*ih2;
@@ -423,8 +423,8 @@ void smMeanVel(SMX smx,int pi,int nSmooth,int *pList,float *fList)
 		else rs = 0.25*rs*rs*rs;
 		rs *= fNorm;
 		for (j=0;j<3;++j) {
-			smx->kd->p[pi].vMean[j] += rs*smx->kd->p[pj].fMass*
-				smx->kd->p[pj].v[j];
+			smx->kd->p[pi].vMean[j] += rs*smx->kd->p[pj].fMass/
+				smx->kd->p[pj].fDensity*smx->kd->p[pj].v[j];
 			}
 		}
 	}
@@ -446,9 +446,9 @@ void smMeanVelSym(SMX smx,int pi,int nSmooth,int *pList,float *fList)
 		rs *= fNorm;
 		for (j=0;j<3;++j) {
 			smx->kd->p[pi].vMean[j] += rs*smx->kd->p[pj].fMass/
-				smx->kd->p[pi].fDensity*smx->kd->p[pj].v[j];
+				smx->kd->p[pj].fDensity*smx->kd->p[pj].v[j];
 			smx->kd->p[pj].vMean[j] += rs*smx->kd->p[pi].fMass/
-				smx->kd->p[pj].fDensity*smx->kd->p[pi].v[j];
+				smx->kd->p[pi].fDensity*smx->kd->p[pi].v[j];
 			}
 		}
 	}
@@ -474,7 +474,7 @@ void smVelDisp(SMX smx,int pi,int nSmooth,int *pList,float *fList)
 				(smx->kd->p[pj].v[j] - smx->kd->p[pi].vMean[j]);
 			}
 		smx->kd->p[pi].fVel2 += rs*smx->kd->p[pj].fMass/
-			smx->kd->p[pi].fDensity*tv2;
+			smx->kd->p[pj].fDensity*tv2;
 		}
 	}	
 
@@ -499,14 +499,14 @@ void smVelDispSym(SMX smx,int pi,int nSmooth,int *pList,float *fList)
 				(smx->kd->p[pj].v[j] - smx->kd->p[pi].vMean[j]);
 			}
 		smx->kd->p[pi].fVel2 += rs*smx->kd->p[pj].fMass/
-			smx->kd->p[pi].fDensity*tv2;
+			smx->kd->p[pj].fDensity*tv2;
 		tv2 = 0.0;
 		for (j=0;j<3;++j) {
 			tv2 += (smx->kd->p[pi].v[j] - smx->kd->p[pj].vMean[j])*
 				(smx->kd->p[pi].v[j] - smx->kd->p[pj].vMean[j]);
 			}
 		smx->kd->p[pj].fVel2 += rs*smx->kd->p[pi].fMass/
-			smx->kd->p[pj].fDensity*tv2;
+			smx->kd->p[pi].fDensity*tv2;
 		}
 	}
 
