@@ -9,8 +9,24 @@
 int smInit(SMX *psmx,KD kd,int nSmooth,float *fPeriod)
 {
 	SMX smx;
+	KDN *root;
 	int pi,j;
+	int bError=0;
 
+	root = &kd->kdNodes[ROOT];
+	assert(root != NULL);
+	/*
+	 ** Check to make sure that the bounds of the simulation agree 
+	 ** with the period specified, if not cause an error.
+	 */
+	for (j=0;j<3;++j) {
+		if (root->bnd.fMax[j] - root->bnd.fMin[j] > fPeriod[j]) {
+			fprintf(stderr,"ERROR(smInit):Bounds of the simulation volume exceed\n");
+			fprintf(stderr,"exceed the period specified in the %c-dimension.\n",'x'+j);
+			bError = 1;
+			}
+		}
+	if (bError) exit(1);
 	assert(nSmooth <= kd->nActive);
 	smx = (SMX)malloc(sizeof(struct smContext));
 	assert(smx != NULL);

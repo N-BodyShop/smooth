@@ -8,6 +8,9 @@
 #include "smooth.h"
 
 
+#define BIGNOTQUITEMAXFLOAT		((float)1.0e+37)
+
+
 void usage(void)
 {
 	fprintf(stderr,"USAGE:\n");
@@ -51,7 +54,7 @@ void main(int argc,char **argv)
 	bMark = 0;
 	strcpy(achFile,"smooth");
 	i = 1;
-	for (j=0;j<3;++j) fPeriod[j] = HUGE;
+	for (j=0;j<3;++j) fPeriod[j] = BIGNOTQUITEMAXFLOAT;
 	while (i < argc) {
 		if (!strcmp(argv[i],"-b")) {
 			++i;
