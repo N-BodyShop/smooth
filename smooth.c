@@ -223,7 +223,9 @@ void smSmooth(SMX smx,void (*fncSmooth)(SMX,int,int,int *,float *))
 	c = smx->kd->kdNodes;
 	p = smx->kd->p;
 	for (pi=0;pi<smx->kd->nActive;++pi) {
-		if (smx->kd->p[pi].iMark) smx->pfBall2[pi] = -1.0;
+		if (fncSmooth == smDensity /* need to density for all
+					      particles */
+		    || smx->kd->p[pi].iMark) smx->pfBall2[pi] = -1.0;
 		else smx->pfBall2[pi] = 1.0;	/* pretend it is already done! */
 		}
 	smx->pfBall2[smx->kd->nActive] = -1.0; /* stop condition */
@@ -611,9 +613,9 @@ void smVelDispNB(SMX smx,int pi,int nSmooth,int *pList,float *fList)
 		for (j=0;j<3;++j) {
 			dr = smx->kd->p[pj].r[j] - smx->kd->p[pi].r[j];
 			tv2 += (smx->kd->p[pj].v[j] - smx->kd->p[pi].vMean[j] -
-					smx->kd->p[pi].fDivv*dr)*
+					smx->kd->p[pi].fDivv*dr/3.0)*
 				(smx->kd->p[pj].v[j] - smx->kd->p[pi].vMean[j] -
-				 smx->kd->p[pi].fDivv*dr);
+				 smx->kd->p[pi].fDivv*dr/3.0);
 			}
 		smx->kd->p[pi].fVel2 += rs*smx->kd->p[pj].fMass/
 			smx->kd->p[pj].fDensity*tv2;
