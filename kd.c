@@ -217,17 +217,22 @@ void kdInMark(KD kd,char *pszFile)
 	fgets(ach,80,fp);	/* ignore the array header! */
 	iCnt = 0;
 	for (i=0;i<kd->nGas;++i) {
-		if (kd->bGas) fscanf(fp,"%d",&kd->p[iCnt++].iMark);
-		else fscanf(fp,"%d",&iDum);
+		kd->p[iCnt++].iMark = 0;
 		}
 	for (i=0;i<kd->nDark;++i) {
-		if (kd->bDark) fscanf(fp,"%d",&kd->p[iCnt++].iMark);
-		else fscanf(fp,"%d",&iDum);
+		kd->p[iCnt++].iMark = 0;
 		}
 	for (i=0;i<kd->nStar;++i) {
-		if (kd->bStar) fscanf(fp,"%d",&kd->p[iCnt++].iMark);
-		else fscanf(fp,"%d",&iDum);
+		kd->p[iCnt++].iMark = 0;
 		}
+	while(1) {
+	    fscanf(fp, "%d", &iDum);
+	    if(feof(fp))
+		break;
+	    iDum--;
+	    assert(iDum < kd->nParticles);
+	    kd->p[iDum].iMark = 1;
+	    }
 	fclose(fp);
 	}
 
