@@ -1,0 +1,40 @@
+
+
+						SMOOTH V2.1 
+
+		A Smoothing Program for N-body Simulations
+
+						OCT 11, 1994
+
+CHANGES from V2.0:
+	* Support for mark arrays added.
+	* MAXFLOAT changed to HUGE, to comply with newer math.h
+
+
+Included are:
+	Makefile
+	cat1/smooth.1
+	kd.c
+	kd.h
+	main.c
+	man1/smooth.1
+	smooth.c
+	smooth.h
+	tipsydefs.h
+
+For detailed information read the man page (either cat1/smooth.1 or
+man1/smooth.1).
+
+To build:
+
+	> make
+
+To get further information contact:
+
+	hpccsoft@astro.washington.edu
+
+
+
+
+
+
