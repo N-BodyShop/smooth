@@ -159,6 +159,7 @@ int main(int argc,char **argv)
 		else if (!strcmp(argv[i],"veldisp")) {
 			bDensity |= 1;
 			bMeanVel |= 1;
+			bDivv |= 1;
 			bVelDisp |= 3;
 			++i;
 			}
