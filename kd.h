@@ -51,7 +51,6 @@ typedef struct kdContext {
 	int bStar;
 	int nActive;
 	float fTime;
-	BND bnd;
 	int nLevels;
 	int nNodes;
 	int nSplit;
@@ -64,91 +63,92 @@ typedef struct kdContext {
 
 #define INTERSECT(c,cp,fBall2,lx,ly,lz,x,y,z,sx,sy,sz)\
 {\
-	float dx,dy,dz,dx1,dy1,dz1,fDist2;\
-	dx = c[cp].bnd.fMin[0]-x;\
-	dx1 = x-c[cp].bnd.fMax[0];\
-	dy = c[cp].bnd.fMin[1]-y;\
-	dy1 = y-c[cp].bnd.fMax[1];\
-	dz = c[cp].bnd.fMin[2]-z;\
-	dz1 = z-c[cp].bnd.fMax[2];\
-	if (dx > 0.0) {\
-		dx1 += lx;\
-		if (dx1 < dx) {\
-			fDist2 = dx1*dx1;\
+	float INTRSCT_dx,INTRSCT_dy,INTRSCT_dz;\
+	float INTRSCT_dx1,INTRSCT_dy1,INTRSCT_dz1,INTRSCT_fDist2;\
+	INTRSCT_dx = c[cp].bnd.fMin[0]-x;\
+	INTRSCT_dx1 = x-c[cp].bnd.fMax[0];\
+	INTRSCT_dy = c[cp].bnd.fMin[1]-y;\
+	INTRSCT_dy1 = y-c[cp].bnd.fMax[1];\
+	INTRSCT_dz = c[cp].bnd.fMin[2]-z;\
+	INTRSCT_dz1 = z-c[cp].bnd.fMax[2];\
+	if (INTRSCT_dx > 0.0) {\
+		INTRSCT_dx1 += lx;\
+		if (INTRSCT_dx1 < INTRSCT_dx) {\
+			INTRSCT_fDist2 = INTRSCT_dx1*INTRSCT_dx1;\
 			sx = x+lx;\
 			}\
 		else {\
-			fDist2 = dx*dx;\
+			INTRSCT_fDist2 = INTRSCT_dx*INTRSCT_dx;\
 			sx = x;\
 			}\
-		if (fDist2 > fBall2) goto GetNextCell;\
+		if (INTRSCT_fDist2 > fBall2) goto GetNextCell;\
 		}\
-	else if (dx1 > 0.0) {\
-		dx += lx;\
-		if (dx < dx1) {\
-			fDist2 = dx*dx;\
+	else if (INTRSCT_dx1 > 0.0) {\
+		INTRSCT_dx += lx;\
+		if (INTRSCT_dx < INTRSCT_dx1) {\
+			INTRSCT_fDist2 = INTRSCT_dx*INTRSCT_dx;\
 			sx = x-lx;\
 			}\
 		else {\
-			fDist2 = dx1*dx1;\
+			INTRSCT_fDist2 = INTRSCT_dx1*INTRSCT_dx1;\
 			sx = x;\
 			}\
-		if (fDist2 > fBall2) goto GetNextCell;\
+		if (INTRSCT_fDist2 > fBall2) goto GetNextCell;\
 		}\
 	else {\
-		fDist2 = 0.0;\
+		INTRSCT_fDist2 = 0.0;\
 		sx = x;\
 		}\
-	if (dy > 0.0) {\
-		dy1 += ly;\
-		if (dy1 < dy) {\
-			fDist2 += dy1*dy1;\
+	if (INTRSCT_dy > 0.0) {\
+		INTRSCT_dy1 += ly;\
+		if (INTRSCT_dy1 < INTRSCT_dy) {\
+			INTRSCT_fDist2 += INTRSCT_dy1*INTRSCT_dy1;\
 			sy = y+ly;\
 			}\
 		else {\
-			fDist2 += dy*dy;\
+			INTRSCT_fDist2 += INTRSCT_dy*INTRSCT_dy;\
 			sy = y;\
 			}\
-		if (fDist2 > fBall2) goto GetNextCell;\
+		if (INTRSCT_fDist2 > fBall2) goto GetNextCell;\
 		}\
-	else if (dy1 > 0.0) {\
-		dy += ly;\
-		if (dy < dy1) {\
-			fDist2 += dy*dy;\
+	else if (INTRSCT_dy1 > 0.0) {\
+		INTRSCT_dy += ly;\
+		if (INTRSCT_dy < INTRSCT_dy1) {\
+			INTRSCT_fDist2 += INTRSCT_dy*INTRSCT_dy;\
 			sy = y-ly;\
 			}\
 		else {\
-			fDist2 += dy1*dy1;\
+			INTRSCT_fDist2 += INTRSCT_dy1*INTRSCT_dy1;\
 			sy = y;\
 			}\
-		if (fDist2 > fBall2) goto GetNextCell;\
+		if (INTRSCT_fDist2 > fBall2) goto GetNextCell;\
 		}\
 	else {\
 		sy = y;\
 		}\
-	if (dz > 0.0) {\
-		dz1 += lz;\
-		if (dz1 < dz) {\
-			fDist2 += dz1*dz1;\
+	if (INTRSCT_dz > 0.0) {\
+		INTRSCT_dz1 += lz;\
+		if (INTRSCT_dz1 < INTRSCT_dz) {\
+			INTRSCT_fDist2 += INTRSCT_dz1*INTRSCT_dz1;\
 			sz = z+lz;\
 			}\
 		else {\
-			fDist2 += dz*dz;\
+			INTRSCT_fDist2 += INTRSCT_dz*INTRSCT_dz;\
 			sz = z;\
 			}\
-		if (fDist2 > fBall2) goto GetNextCell;\
+		if (INTRSCT_fDist2 > fBall2) goto GetNextCell;\
 		}\
-	else if (dz1 > 0.0) {\
-		dz += lz;\
-		if (dz < dz1) {\
-			fDist2 += dz*dz;\
+	else if (INTRSCT_dz1 > 0.0) {\
+		INTRSCT_dz += lz;\
+		if (INTRSCT_dz < INTRSCT_dz1) {\
+			INTRSCT_fDist2 += INTRSCT_dz*INTRSCT_dz;\
 			sz = z-lz;\
 			}\
 		else {\
-			fDist2 += dz1*dz1;\
+			INTRSCT_fDist2 += INTRSCT_dz1*INTRSCT_dz1;\
 			sz = z;\
 			}\
-		if (fDist2 > fBall2) goto GetNextCell;\
+		if (INTRSCT_fDist2 > fBall2) goto GetNextCell;\
 		}\
 	else {\
 		sz = z;\
@@ -160,7 +160,7 @@ void kdTime(KD,int *,int *);
 int kdInit(KD *,int);
 int kdReadTipsy(KD,FILE *,int,int,int);
 void kdInMark(KD,char *);
-int kdBuildTree(KD);
+void kdBuildTree(KD);
 void kdOrder(KD);
 void kdFinish(KD);
 
