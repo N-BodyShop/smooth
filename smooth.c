@@ -50,6 +50,8 @@ void smFinish(SMX smx)
 	free(smx->pfBall2);
 	free(smx->iMark);
 	free(smx->pq);
+	free(smx->fList);
+	free(smx->pList);
 	free(smx);
 	}
 
