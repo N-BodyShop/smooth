@@ -25,6 +25,7 @@ typedef struct Particle {
 	float fDensity;
 	float vMean[3];
 	float fVel2;
+	float fDivv;
 	} PARTICLE;
 
 typedef struct bndBound {

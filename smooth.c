@@ -55,6 +55,7 @@ int smInit(SMX *psmx,KD kd,int nSmooth,float *fPeriod)
 		smx->kd->p[pi].fDensity = 0.0;
 		for (j=0;j<3;++j) smx->kd->p[pi].vMean[j] = 0.0;
 		smx->kd->p[pi].fVel2 = 0.0;
+		smx->kd->p[pi].fDivv = 0.0;
 		}
 	*psmx = smx;	
 	return(1);
@@ -470,6 +471,70 @@ void smMeanVelSym(SMX smx,int pi,int nSmooth,int *pList,float *fList)
 	}
 
 
+void smDivv(SMX smx,int pi,int nSmooth,int *pList,float *fList)
+{
+	float fNorm,ih2,r2,rs;
+	float r, rs1, dvdotdr, fNorm1;
+	int i,j,pj;
+
+	ih2 = 4.0/smx->pfBall2[pi];
+	fNorm = M_1_PI*sqrt(ih2)*ih2;
+	fNorm1 = fNorm*ih2;
+	for (i=0;i<nSmooth;++i) {
+		pj = pList[i];
+		r2 = fList[i]*ih2;
+		r = sqrt(r2);
+		rs = 2.0 - r;
+		if (r2 < 1.0) {
+			rs1 = -3 + 2.25*r;
+			}
+		else {
+			rs1 = -0.75*rs*rs/r;
+			}
+		rs1 *= fNorm1;
+		dvdotdr = 0.0;
+		for (j=0;j<3;++j) {
+			dvdotdr += (smx->kd->p[pj].v[j] - smx->kd->p[pi].v[j])*
+				(smx->kd->p[pj].r[j] - smx->kd->p[pi].r[j]);
+			}
+		smx->kd->p[pi].fDivv -= rs1*smx->kd->p[pj].fMass/
+			smx->kd->p[pj].fDensity*dvdotdr;
+		}
+	}	
+
+void smDivvSym(SMX smx,int pi,int nSmooth,int *pList,float *fList)
+{
+	float fNorm,ih2,r2,rs;
+	float r, rs1, dvdotdr, fNorm1;
+	int i,j,pj;
+
+	ih2 = 4.0/smx->pfBall2[pi];
+	fNorm = 0.5*M_1_PI*sqrt(ih2)*ih2;
+	fNorm1 = fNorm*ih2;
+	for (i=0;i<nSmooth;++i) {
+		pj = pList[i];
+		r2 = fList[i]*ih2;
+		r = sqrt(r2);
+		rs = 2.0 - r;
+		if (r2 < 1.0) {
+			rs1 = -3 + 2.25*r;
+			}
+		else {
+			rs1 = -0.75*rs*rs/r;
+			}
+		rs1 *= fNorm1;
+		dvdotdr = 0.0;
+		for (j=0;j<3;++j) {
+			dvdotdr += (smx->kd->p[pj].v[j] - smx->kd->p[pi].v[j])*
+				(smx->kd->p[pj].r[j] - smx->kd->p[pi].r[j]);
+			}
+		smx->kd->p[pi].fDivv -= rs1*smx->kd->p[pj].fMass/
+			smx->kd->p[pj].fDensity*dvdotdr;
+		smx->kd->p[pj].fDivv -= rs1*smx->kd->p[pi].fMass/
+			smx->kd->p[pi].fDensity*dvdotdr;
+		}
+	}	
+
 void smVelDisp(SMX smx,int pi,int nSmooth,int *pList,float *fList)
 {
 	float fNorm,ih2,r2,rs,tv2;
@@ -526,6 +591,64 @@ void smVelDispSym(SMX smx,int pi,int nSmooth,int *pList,float *fList)
 		}
 	}
 
+
+void smVelDispNB(SMX smx,int pi,int nSmooth,int *pList,float *fList)
+{
+	float fNorm,ih2,r2,rs,tv2;
+	float dr;
+	int i,j,pj;
+
+	ih2 = 4.0/smx->pfBall2[pi];
+	fNorm = M_1_PI*sqrt(ih2)*ih2;
+	for (i=0;i<nSmooth;++i) {
+		pj = pList[i];
+		r2 = fList[i]*ih2;
+		rs = 2.0 - sqrt(r2);
+		if (r2 < 1.0) rs = (1.0 - 0.75*rs*r2);
+		else rs = 0.25*rs*rs*rs;
+		rs *= fNorm;
+		tv2 = 0.0;
+		for (j=0;j<3;++j) {
+			dr = smx->kd->p[pj].r[j] - smx->kd->p[pi].r[j];
+			tv2 += (smx->kd->p[pj].v[j] - smx->kd->p[pi].vMean[j] -
+					smx->kd->p[pi].fDivv*dr)*
+				(smx->kd->p[pj].v[j] - smx->kd->p[pi].vMean[j] -
+				 smx->kd->p[pi].fDivv*dr);
+			}
+		smx->kd->p[pi].fVel2 += rs*smx->kd->p[pj].fMass/
+			smx->kd->p[pj].fDensity*tv2;
+		}
+	}	
+
+void smVelDispNBSym(SMX smx,int pi,int nSmooth,int *pList,float *fList)
+{
+	float fNorm,ih2,r2,rs,tv2;
+	float dr;
+	int i,j,pj;
+
+	ih2 = 4.0/smx->pfBall2[pi];
+	fNorm = 0.5*M_1_PI*sqrt(ih2)*ih2;
+	for (i=0;i<nSmooth;++i) {
+		pj = pList[i];
+		r2 = fList[i]*ih2;
+		rs = 2.0 - sqrt(r2);
+		if (r2 < 1.0) rs = (1.0 - 0.75*rs*r2);
+		else rs = 0.25*rs*rs*rs;
+		rs *= fNorm;
+		tv2 = 0.0;
+		for (j=0;j<3;++j) {
+			dr = smx->kd->p[pj].r[j] - smx->kd->p[pi].r[j];
+			tv2 += (smx->kd->p[pj].v[j] - smx->kd->p[pi].vMean[j] -
+					smx->kd->p[pi].fDivv*dr)*
+				(smx->kd->p[pj].v[j] - smx->kd->p[pi].vMean[j] -
+				 smx->kd->p[pi].fDivv*dr);
+			}
+		smx->kd->p[pi].fVel2 += rs*smx->kd->p[pj].fMass/
+			smx->kd->p[pj].fDensity*tv2;
+		smx->kd->p[pj].fVel2 += rs*smx->kd->p[pi].fMass/
+			smx->kd->p[pi].fDensity*tv2;
+		}
+	}	
 
 void smOutDensity(SMX smx,FILE *fp)
 {
@@ -694,7 +817,7 @@ void smOutVelDisp(SMX smx,FILE *fp)
 	}
 
 
-void smOutPhase(SMX smx,FILE *fp)
+void smOutDivv(SMX smx,FILE *fp)
 {
 	int i,iCnt;
 
@@ -703,8 +826,7 @@ void smOutPhase(SMX smx,FILE *fp)
 	for (i=0;i<smx->kd->nGas;++i) {
 		if (smx->kd->bGas) {
 			if (smx->kd->p[iCnt].iMark) {
-				fprintf(fp,"%.8g\n",smx->kd->p[iCnt].fDensity/
-						sqrt(smx->kd->p[iCnt].fVel2));
+				fprintf(fp,"%.8g\n",smx->kd->p[iCnt].fDivv);
 				}
 			else fprintf(fp,"0\n");
 			++iCnt;
@@ -714,8 +836,7 @@ void smOutPhase(SMX smx,FILE *fp)
 	for (i=0;i<smx->kd->nDark;++i) {
 		if (smx->kd->bDark) {
 			if (smx->kd->p[iCnt].iMark) {
-				fprintf(fp,"%.8g\n",smx->kd->p[iCnt].fDensity/
-						sqrt(smx->kd->p[iCnt].fVel2));
+				fprintf(fp,"%.8g\n",smx->kd->p[iCnt].fDivv);
 				}
 			else fprintf(fp,"0\n");
 			++iCnt;
@@ -725,8 +846,52 @@ void smOutPhase(SMX smx,FILE *fp)
 	for (i=0;i<smx->kd->nStar;++i) {
 		if (smx->kd->bStar) {
 			if (smx->kd->p[iCnt].iMark) {
-				fprintf(fp,"%.8g\n",smx->kd->p[iCnt].fDensity/
-						sqrt(smx->kd->p[iCnt].fVel2));
+				fprintf(fp,"%.8g\n",smx->kd->p[iCnt].fDivv);
+				}
+			else fprintf(fp,"0\n");
+			++iCnt;
+			}
+		else fprintf(fp,"0\n");
+		}
+	}
+
+void smOutPhase(SMX smx,FILE *fp)
+{
+	int i,iCnt;
+	float f;
+
+	fprintf(fp,"%d\n",smx->kd->nParticles);
+	iCnt = 0;
+	for (i=0;i<smx->kd->nGas;++i) {
+		if (smx->kd->bGas) {
+			if (smx->kd->p[iCnt].iMark) {
+				f = smx->kd->p[iCnt].fVel2;
+				f *= sqrt(f);
+				fprintf(fp,"%.8g\n",smx->kd->p[iCnt].fDensity/f);
+				}
+			else fprintf(fp,"0\n");
+			++iCnt;
+			}
+		else fprintf(fp,"0\n");
+		}
+	for (i=0;i<smx->kd->nDark;++i) {
+		if (smx->kd->bDark) {
+			if (smx->kd->p[iCnt].iMark) {
+				f = smx->kd->p[iCnt].fVel2;
+				f *= sqrt(f);
+				fprintf(fp,"%.8g\n",smx->kd->p[iCnt].fDensity/f);
+				}
+			else fprintf(fp,"0\n");
+			++iCnt;
+			}
+		else fprintf(fp,"0\n");
+		}
+	for (i=0;i<smx->kd->nStar;++i) {
+		if (smx->kd->bStar) {
+			if (smx->kd->p[iCnt].iMark) {
+				f = smx->kd->p[iCnt].fVel2;
+				f *= sqrt(f);
+				fprintf(fp,"%.8g\n",smx->kd->p[iCnt].fDensity/f);
 				}
 			else fprintf(fp,"0\n");
 			++iCnt;

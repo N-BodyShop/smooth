@@ -19,13 +19,13 @@ void usage(void)
 	fprintf(stderr,"   [-px <xPeriod>] [-py <yPeriod>] [-pz <zPeriod>]\n");
 	fprintf(stderr,"   [-do <MarkFile>]\n");
 	fprintf(stderr,"   [density] [meanvel] [speed] [veldisp] [mach]\n");
-	fprintf(stderr,"   [phase] [hsmooth] [all] [null]\n\n");
+	fprintf(stderr,"   [phase] [hsmooth] [divv] [all] [null]\n\n");
 	fprintf(stderr,"Input taken from stdin in tipsy binary format.\n");
 	fprintf(stderr,"SEE MAN PAGE: smooth(1) for more information.\n");
 	exit(1);
 	}
 
-void main(int argc,char **argv)
+int main(int argc,char **argv)
 {
 	KD kd;
 	SMX smx;
@@ -37,6 +37,7 @@ void main(int argc,char **argv)
 	int bHsmooth;
 	int bDark,bGas,bStar;
 	int bMark;
+	int bDivv;
 	char *p,*q;
 	
    	nBucket = 16;
@@ -48,6 +49,7 @@ void main(int argc,char **argv)
 	bMach = 0;
 	bPhase = 0;
 	bHsmooth = 0;
+	bDivv = 0;
 	bNull = 0;
 	bSym = 1;
 	bDark = 1;
@@ -158,6 +160,7 @@ void main(int argc,char **argv)
 			bDensity |= 1;
 			bMeanVel |= 1;
 			bVelDisp |= 1;
+			bDivv |= 1;
 			bPhase |= 2;
 			++i;
 			}
@@ -174,6 +177,11 @@ void main(int argc,char **argv)
 			bSpeed |= 2;
 			++i;
 			}
+		else if (!strcmp(argv[i],"divv")) {
+			bDensity |= 1;
+			bDivv |= 3;
+			++i;
+			}
 		else if (!strcmp(argv[i],"hsmooth")) {
 			bDensity |= 1;
 			bHsmooth |= 2;
@@ -187,6 +195,7 @@ void main(int argc,char **argv)
 			bDensity |= 3;
 			bMeanVel |= 3;
 			bVelDisp |= 3;
+			bDivv |= 3;
 			bPhase |= 2;
 			bMach |= 2;
 			bSpeed |= 2;
@@ -207,12 +216,14 @@ void main(int argc,char **argv)
 	if (bSym) {
 		if (bDensity&1) smSmooth(smx,smDensitySym);
 		if (bMeanVel&1) smReSmooth(smx,smMeanVelSym);
-		if (bVelDisp&1) smReSmooth(smx,smVelDispSym);
+		if (bDivv&1) smReSmooth(smx,smDivvSym);
+		if (bVelDisp&1) smReSmooth(smx,smVelDispNBSym);
 		}
 	else {
 		if (bDensity&1) smSmooth(smx,smDensity);
 		if (bMeanVel&1) smReSmooth(smx,smMeanVel);
-		if (bVelDisp&1) smReSmooth(smx,smVelDisp);
+		if (bDivv&1) smReSmooth(smx,smDivv);
+		if (bVelDisp&1) smReSmooth(smx,smVelDispNB);
 		}
 	kdOrder(kd);
 	if (bDensity&2) {
@@ -247,6 +258,14 @@ void main(int argc,char **argv)
 		smOutVelDisp(smx,fp);
 		fclose(fp);
 		}
+	if (bDivv&2) {
+		strcpy(ach,achFile);
+		strcat(ach,".dvv");
+		fp = fopen(ach,"w");
+		assert(fp != NULL);
+		smOutDivv(smx,fp);
+		fclose(fp);
+		}
 	if (bMach&2) {
 		strcpy(ach,achFile);
 		strcat(ach,".mch");
@@ -273,6 +292,7 @@ void main(int argc,char **argv)
 		}
 	smFinish(smx);
 	kdFinish(kd);
+	return 0;
 	}
 	
 
