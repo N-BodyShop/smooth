@@ -1,7 +1,7 @@
 #
 # Makefile for smooth.
 #
-CFLAGS	=   -O2
+CFLAGS	=   -O3
 LIBS	=   -lm
 
 default:	smooth clean

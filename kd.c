@@ -6,6 +6,55 @@
 #include <assert.h>
 #include "kd.h"
 #include "tipsydefs.h"
+#include <rpc/types.h>
+#include <rpc/xdr.h>
+
+
+int xdr_header(XDR *xdrs, struct dump *header)
+{
+  int pad;
+  
+  if(xdr_double(xdrs, &header->time) != TRUE)
+    return 0;
+  if(xdr_int(xdrs, &header->nbodies) != TRUE)
+    return 0;
+  if(xdr_int(xdrs, &header->ndim) != TRUE)
+    return 0;
+  if(xdr_int(xdrs, &header->nsph) != TRUE)
+    return 0;
+  if(xdr_int(xdrs, &header->ndark) != TRUE)
+    return 0;
+  if(xdr_int(xdrs, &header->nstar) != TRUE)
+    return 0;
+  if(xdr_int(xdrs, &pad) != TRUE)
+    return 0;
+  return 1;
+}
+
+int xdr_dark(xdrs, dark)
+XDR *xdrs;
+struct dark_particle *dark;
+{
+      if(xdr_float(xdrs, &dark->mass) != TRUE)
+	return 0;
+      if(xdr_float(xdrs, &dark->pos[0]) != TRUE)
+	return 0;
+      if(xdr_float(xdrs, &dark->pos[1]) != TRUE)
+	return 0;
+      if(xdr_float(xdrs, &dark->pos[2]) != TRUE)
+	return 0;
+      if(xdr_float(xdrs, &dark->vel[0]) != TRUE)
+	return 0;
+      if(xdr_float(xdrs, &dark->vel[1]) != TRUE)
+	return 0;
+      if(xdr_float(xdrs, &dark->vel[2]) != TRUE)
+	return 0;
+      if(xdr_float(xdrs, &dark->eps) != TRUE)
+	return 0;
+      if(xdr_float(xdrs, &dark->phi) != TRUE)
+	return 0;
+      return 1;
+}  
 
 
 #define MAX_ROOT_ITTR	32

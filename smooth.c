@@ -1019,7 +1019,7 @@ void smOutHsmooth(SMX smx,FILE *fp)
 	for (i=0;i<smx->kd->nGas;++i) {
 		if (smx->kd->bGas) {
 			if (smx->kd->p[iCnt].iMark) {
-				fprintf(fp,"%.8g\n",sqrt(smx->pfBall2[iCnt]));
+				fprintf(fp,"%.8g\n",0.5*sqrt(smx->pfBall2[iCnt]));
 				}
 			else fprintf(fp,"0\n");
 			++iCnt;
@@ -1029,7 +1029,7 @@ void smOutHsmooth(SMX smx,FILE *fp)
 	for (i=0;i<smx->kd->nDark;++i) {
 		if (smx->kd->bDark) {
 			if (smx->kd->p[iCnt].iMark) {
-				fprintf(fp,"%.8g\n",sqrt(smx->pfBall2[iCnt]));
+				fprintf(fp,"%.8g\n",0.5*sqrt(smx->pfBall2[iCnt]));
 				}
 			else fprintf(fp,"0\n");
 			++iCnt;
@@ -1039,7 +1039,7 @@ void smOutHsmooth(SMX smx,FILE *fp)
 	for (i=0;i<smx->kd->nStar;++i) {
 		if (smx->kd->bStar) {
 			if (smx->kd->p[iCnt].iMark) {
-				fprintf(fp,"%.8g\n",sqrt(smx->pfBall2[iCnt]));
+				fprintf(fp,"%.8g\n",0.5*sqrt(smx->pfBall2[iCnt]));
 				}
 			else fprintf(fp,"0\n");
 			++iCnt;

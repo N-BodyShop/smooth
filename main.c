@@ -183,7 +183,7 @@ int main(int argc,char **argv)
 			++i;
 			}
 		else if (!strcmp(argv[i],"hsmooth")) {
-			bDensity |= 1;
+			bNull |= 1;
 			bHsmooth |= 2;
 			++i;
 			}
@@ -211,16 +211,21 @@ int main(int argc,char **argv)
 	smInit(&smx,kd,nSmooth,fPeriod);
 	if (bNull&1) {
 		smSmooth(smx,smNull);
-		smReSmooth(smx,smNull);
 		}
 	if (bSym) {
-		if (bDensity&1) smSmooth(smx,smDensitySym);
+		if (bDensity&1) {
+			if (bNull&1) smReSmooth(smx,smDensitySym);
+			else smSmooth(smx,smDensitySym);
+			}
 		if (bMeanVel&1) smReSmooth(smx,smMeanVelSym);
 		if (bDivv&1) smReSmooth(smx,smDivvSym);
 		if (bVelDisp&1) smReSmooth(smx,smVelDispNBSym);
 		}
 	else {
-		if (bDensity&1) smSmooth(smx,smDensity);
+		if (bDensity&1) {
+			if (bNull&1) smReSmooth(smx,smDensity);
+			else smSmooth(smx,smDensity);
+			}
 		if (bMeanVel&1) smReSmooth(smx,smMeanVel);
 		if (bDivv&1) smReSmooth(smx,smDivv);
 		if (bVelDisp&1) smReSmooth(smx,smVelDispNB);
