@@ -34,6 +34,8 @@ int kdInit(KD *pkd,int nBucket)
 	kd = (KD)malloc(sizeof(struct kdContext));
 	assert(kd != NULL);
 	kd->nBucket = nBucket;
+	kd->p = NULL;
+	kd->kdNodes = NULL;
 	*pkd = kd;
 	return(1);
 	}
@@ -42,7 +44,6 @@ int kdInit(KD *pkd,int nBucket)
 int kdReadTipsy(KD kd,FILE *fp,int bDark,int bGas,int bStar)
 {
 	int i,j,nCnt;
-	BND bnd;
 	struct dump h;
 	struct gas_particle gp;
 	struct dark_particle dp;
@@ -103,22 +104,6 @@ int kdReadTipsy(KD kd,FILE *fp,int bDark,int bGas,int bStar)
 			++nCnt;
 			}
 		}
-	/*
-	 ** Calculate Bounds.
-	 */
-	for (j=0;j<3;++j) {
-		bnd.fMin[j] = kd->p[0].r[j];
-		bnd.fMax[j] = kd->p[0].r[j];
-		}
-	for (i=1;i<kd->nActive;++i) {
-		for (j=0;j<3;++j) {
-			if (bnd.fMin[j] > kd->p[i].r[j]) 
-				bnd.fMin[j] = kd->p[i].r[j];
-			else if (bnd.fMax[j] < kd->p[i].r[j])
-				bnd.fMax[j] = kd->p[i].r[j];
-			}
-		}
-	kd->bnd = bnd;
 	return(kd->nParticles);
 	}
 
@@ -152,46 +137,35 @@ void kdInMark(KD kd,char *pszFile)
 	}
 
 
-/*
- ** JST's Median Algorithm
- */
-int kdMedianJst(KD kd,int d,int l,int u)
+void kdSelect(KD kd,int d,int k,int l,int r)
 {
-	float fm;
-    int i,k,m;
-    PARTICLE *p,t;
+	PARTICLE *p,t;
+	double v;
+	int i,j;
 
 	p = kd->p;
-    k = (l+u)/2;
-	m = k;
-    while (l < u) {
-		m = (l+u)/2;
-		fm = p[m].r[d];
-		t = p[m];
-		p[m] = p[u];
-		p[u] = t;
-		i = u-1;
-		m = l;
-		while (p[m].r[d] < fm) ++m;
-		while (m < i) {
-			while (p[i].r[d] >= fm) if (--i == m) break;
-			/*
-			 ** Swap
-			 */
-			t = p[m];
-			p[m] = p[i];
-			p[i] = t;
-			--i;
-			while (p[m].r[d] < fm) ++m;
+	while (r > l) {
+		v = p[k].r[d];
+		t = p[r];
+		p[r] = p[k];
+		p[k] = t;
+		i = l - 1;
+		j = r;
+		while (1) {
+			while (i < j) if (p[++i].r[d] >= v) break;
+			while (i < j) if (p[--j].r[d] <= v) break;
+			t = p[i];
+			p[i] = p[j];
+			p[j] = t;
+			if (j <= i) break;
 			}
-		t = p[m];
-		p[m] = p[u];
-		p[u] = t;
-        if (k <= m) u = m-1;
-        if (k >= m) l = m+1;
-        }
-    return(m);
-    }
+		p[j] = p[i];
+		p[i] = p[r];
+		p[r] = t;
+		if (i >= k) r = i - 1;
+		if (i <= k) l = i + 1;
+		}
+	}
 
 
 void kdCombine(KDN *p1,KDN *p2,KDN *pOut)
@@ -245,10 +219,12 @@ void kdUpPass(KD kd,int iCell)
 		}
 	}
 
-int kdBuildTree(KD kd)
+
+void kdBuildTree(KD kd)
 {
-	int l,n,i,d,m,j,ct;
+	int l,n,i,d,m,j,diff;
 	KDN *c;
+	BND bnd;
 
 	n = kd->nActive;
 	kd->nLevels = 1;
@@ -260,46 +236,65 @@ int kdBuildTree(KD kd)
 		}
 	kd->nSplit = l;
 	kd->nNodes = l<<1;
+	if (kd->kdNodes != NULL) free(kd->kdNodes);
 	kd->kdNodes = (KDN *)malloc(kd->nNodes*sizeof(KDN));
 	assert(kd->kdNodes != NULL);
+	/*
+	 ** Calculate Bounds.
+	 */
+	for (j=0;j<3;++j) {
+		bnd.fMin[j] = kd->p[0].r[j];
+		bnd.fMax[j] = kd->p[0].r[j];
+		}
+	for (i=1;i<kd->nActive;++i) {
+		for (j=0;j<3;++j) {
+			if (bnd.fMin[j] > kd->p[i].r[j]) 
+				bnd.fMin[j] = kd->p[i].r[j];
+			else if (bnd.fMax[j] < kd->p[i].r[j])
+				bnd.fMax[j] = kd->p[i].r[j];
+			}
+		}
 	/*
 	 ** Set up ROOT node
 	 */
 	c = kd->kdNodes;
 	c[ROOT].pLower = 0;
 	c[ROOT].pUpper = kd->nActive-1;
-	c[ROOT].bnd = kd->bnd;
+	c[ROOT].bnd = bnd;
 	i = ROOT;
-	ct = ROOT;
-	SETNEXT(ct);
 	while (1) {
-		if (i < kd->nSplit) {
+		assert(c[i].pUpper - c[i].pLower + 1 > 0);
+		if (i < kd->nSplit && (c[i].pUpper - c[i].pLower) > 0) {
 			d = 0;
 			for (j=1;j<3;++j) {
 				if (c[i].bnd.fMax[j]-c[i].bnd.fMin[j] > 
 					c[i].bnd.fMax[d]-c[i].bnd.fMin[d]) d = j;
 				}
 			c[i].iDim = d;
-			m = kdMedianJst(kd,d,c[i].pLower,c[i].pUpper);
+
+			m = (c[i].pLower + c[i].pUpper)/2;
+			kdSelect(kd,d,m,c[i].pLower,c[i].pUpper);
+
 			c[i].fSplit = kd->p[m].r[d];
 			c[LOWER(i)].bnd = c[i].bnd;
 			c[LOWER(i)].bnd.fMax[d] = c[i].fSplit;
 			c[LOWER(i)].pLower = c[i].pLower;
-			c[LOWER(i)].pUpper = m-1;
+			c[LOWER(i)].pUpper = m;
 			c[UPPER(i)].bnd = c[i].bnd;
 			c[UPPER(i)].bnd.fMin[d] = c[i].fSplit;
-			c[UPPER(i)].pLower = m;
+			c[UPPER(i)].pLower = m+1;
 			c[UPPER(i)].pUpper = c[i].pUpper;
+			diff = (m-c[i].pLower+1)-(c[i].pUpper-m);
+			assert(diff == 0 || diff == 1);
 			i = LOWER(i);
 			}
 		else {
 			c[i].iDim = -1;
 			SETNEXT(i);
-			if (i == ct) break;
+			if (i == ROOT) break;
 			}
 		}
 	kdUpPass(kd,ROOT);
-	return(1);
 	}
 
 
