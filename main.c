@@ -19,7 +19,7 @@ void usage(void)
 	fprintf(stderr,"   [-px <xPeriod>] [-py <yPeriod>] [-pz <zPeriod>]\n");
 	fprintf(stderr,"   [-do <MarkFile>]\n");
 	fprintf(stderr,"   [density] [meanvel] [speed] [veldisp] [mach]\n");
-	fprintf(stderr,"   [phase] [all] [null]\n\n");
+	fprintf(stderr,"   [phase] [hsmooth] [all] [null]\n\n");
 	fprintf(stderr,"Input taken from stdin in tipsy binary format.\n");
 	fprintf(stderr,"SEE MAN PAGE: smooth(1) for more information.\n");
 	exit(1);
@@ -34,6 +34,7 @@ void main(int argc,char **argv)
 	char ach[80],achFile[80],achMark[80];
 	float fPeriod[3];
 	int bDensity,bMeanVel,bVelDisp,bPhase,bMach,bSpeed,bNull,bSym;
+	int bHsmooth;
 	int bDark,bGas,bStar;
 	int bMark;
 	char *p,*q;
@@ -46,6 +47,7 @@ void main(int argc,char **argv)
 	bSpeed = 0;
 	bMach = 0;
 	bPhase = 0;
+	bHsmooth = 0;
 	bNull = 0;
 	bSym = 1;
 	bDark = 1;
@@ -172,6 +174,11 @@ void main(int argc,char **argv)
 			bSpeed |= 2;
 			++i;
 			}
+		else if (!strcmp(argv[i],"hsmooth")) {
+			bDensity |= 1;
+			bHsmooth |= 2;
+			++i;
+			}
 		else if (!strcmp(argv[i],"null")) {
 			bNull |= 1;
 			++i;
@@ -183,6 +190,7 @@ void main(int argc,char **argv)
 			bPhase |= 2;
 			bMach |= 2;
 			bSpeed |= 2;
+			bHsmooth |= 2;
 			++i;
 			}
 		else usage();
@@ -253,6 +261,14 @@ void main(int argc,char **argv)
 		fp = fopen(ach,"w");
 		assert(fp != NULL);
 		smOutPhase(smx,fp);
+		fclose(fp);
+		}
+	if (bHsmooth&2) {
+		strcpy(ach,achFile);
+		strcat(ach,".hsm");
+		fp = fopen(ach,"w");
+		assert(fp != NULL);
+		smOutHsmooth(smx,fp);
 		fclose(fp);
 		}
 	smFinish(smx);

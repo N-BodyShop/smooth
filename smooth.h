@@ -102,8 +102,6 @@ void smOutVelDisp(SMX,FILE *);
 void smOutPhase(SMX,FILE *);
 void smOutMach(SMX,FILE *);
 void smOutSpeed(SMX,FILE *);
+void smOutHsmooth(SMX,FILE *);
 
 #endif
-
-
-

@@ -432,8 +432,8 @@ void smMeanVel(SMX smx,int pi,int nSmooth,int *pList,float *fList)
 	ih2 = 4.0/smx->pfBall2[pi];
 	fNorm = M_1_PI*sqrt(ih2)*ih2;
 	for (i=0;i<nSmooth;++i) {
-		pj = smx->pList[i];
-		r2 = smx->fList[i]*ih2;
+		pj = pList[i];
+		r2 = fList[i]*ih2;
 		rs = 2.0 - sqrt(r2);
 		if (r2 < 1.0) rs = (1.0 - 0.75*rs*r2);
 		else rs = 0.25*rs*rs*rs;
@@ -454,8 +454,8 @@ void smMeanVelSym(SMX smx,int pi,int nSmooth,int *pList,float *fList)
 	ih2 = 4.0/smx->pfBall2[pi];
 	fNorm = 0.5*M_1_PI*sqrt(ih2)*ih2;
 	for (i=0;i<nSmooth;++i) {
-		pj = smx->pList[i];
-		r2 = smx->fList[i]*ih2;
+		pj = pList[i];
+		r2 = fList[i]*ih2;
 		rs = 2.0 - sqrt(r2);
 		if (r2 < 1.0) rs = (1.0 - 0.75*rs*r2);
 		else rs = 0.25*rs*rs*rs;
@@ -478,8 +478,8 @@ void smVelDisp(SMX smx,int pi,int nSmooth,int *pList,float *fList)
 	ih2 = 4.0/smx->pfBall2[pi];
 	fNorm = M_1_PI*sqrt(ih2)*ih2;
 	for (i=0;i<nSmooth;++i) {
-		pj = smx->pList[i];
-		r2 = smx->fList[i]*ih2;
+		pj = pList[i];
+		r2 = fList[i]*ih2;
 		rs = 2.0 - sqrt(r2);
 		if (r2 < 1.0) rs = (1.0 - 0.75*rs*r2);
 		else rs = 0.25*rs*rs*rs;
@@ -503,8 +503,8 @@ void smVelDispSym(SMX smx,int pi,int nSmooth,int *pList,float *fList)
 	ih2 = 4.0/smx->pfBall2[pi];
 	fNorm = 0.5*M_1_PI*sqrt(ih2)*ih2;
 	for (i=0;i<nSmooth;++i) {
-		pj = smx->pList[i];
-		r2 = smx->fList[i]*ih2;
+		pj = pList[i];
+		r2 = fList[i]*ih2;
 		rs = 2.0 - sqrt(r2);
 		if (r2 < 1.0) rs = (1.0 - 0.75*rs*r2);
 		else rs = 0.25*rs*rs*rs;
@@ -845,57 +845,45 @@ void smOutSpeed(SMX smx,FILE *fp)
 		}
 	}
 
+void smOutHsmooth(SMX smx,FILE *fp)
+{
+	int i,iCnt;
+
+	fprintf(fp,"%d\n",smx->kd->nParticles);
+	iCnt = 0;
+	for (i=0;i<smx->kd->nGas;++i) {
+		if (smx->kd->bGas) {
+			if (smx->kd->p[iCnt].iMark) {
+				fprintf(fp,"%.8g\n",sqrt(smx->pfBall2[iCnt]));
+				}
+			else fprintf(fp,"0\n");
+			++iCnt;
+			}
+		else fprintf(fp,"0\n");
+		}
+	for (i=0;i<smx->kd->nDark;++i) {
+		if (smx->kd->bDark) {
+			if (smx->kd->p[iCnt].iMark) {
+				fprintf(fp,"%.8g\n",sqrt(smx->pfBall2[iCnt]));
+				}
+			else fprintf(fp,"0\n");
+			++iCnt;
+			}
+		else fprintf(fp,"0\n");
+		}
+	for (i=0;i<smx->kd->nStar;++i) {
+		if (smx->kd->bStar) {
+			if (smx->kd->p[iCnt].iMark) {
+				fprintf(fp,"%.8g\n",sqrt(smx->pfBall2[iCnt]));
+				}
+			else fprintf(fp,"0\n");
+			++iCnt;
+			}
+		else fprintf(fp,"0\n");
+		}
+	}
 
 void smNull(SMX smx,int pi,int nSmooth,int *pList,float *fList)
 {
 	return;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
