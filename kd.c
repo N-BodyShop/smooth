@@ -160,6 +160,7 @@ int kdReadTipsy(KD kd,FILE *fp,int bNative,int bDark,int bGas,int bStar)
 			kd->p[nCnt].iMark = 1;
 			for (j=0;j<3;++j) kd->p[nCnt].r[j] = gp.pos[j];
 			for (j=0;j<3;++j) kd->p[nCnt].v[j] = gp.vel[j];
+			kd->p[nCnt].fSmooth = 0;
 			++nCnt;
 			}
 		}
@@ -176,6 +177,7 @@ int kdReadTipsy(KD kd,FILE *fp,int bNative,int bDark,int bGas,int bStar)
 			kd->p[nCnt].iMark = 1;
 			for (j=0;j<3;++j) kd->p[nCnt].r[j] = dp.pos[j];
 			for (j=0;j<3;++j) kd->p[nCnt].v[j] = dp.vel[j];
+			kd->p[nCnt].fSmooth = 0;
 			++nCnt;
 			}
 		}
@@ -192,6 +194,7 @@ int kdReadTipsy(KD kd,FILE *fp,int bNative,int bDark,int bGas,int bStar)
 			kd->p[nCnt].iMark = 1;
 			for (j=0;j<3;++j) kd->p[nCnt].r[j] = sp.pos[j];
 			for (j=0;j<3;++j) kd->p[nCnt].v[j] = sp.vel[j];
+			kd->p[nCnt].fSmooth = 0;
 			++nCnt;
 			}
 		}

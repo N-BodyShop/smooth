@@ -220,7 +220,8 @@ void smSmooth(SMX smx,void (*fncSmooth)(SMX,int,int,int *,float *))
 	int pi,pin,pj,pNext,nCnt,nSmooth;
 	float dx,dy,dz,x,y,z,h2,ax,ay,az;
 
-
+	c = smx->kd->kdNodes;
+	p = smx->kd->p;
 	for (pi=0;pi<smx->kd->nActive;++pi) {
 		if (smx->kd->p[pi].iMark) smx->pfBall2[pi] = -1.0;
 		else smx->pfBall2[pi] = 1.0;	/* pretend it is already done! */
@@ -230,8 +231,6 @@ void smSmooth(SMX smx,void (*fncSmooth)(SMX,int,int,int *,float *))
 		smx->iMark[pi] = 0;
 		}
 	pqLast = &smx->pq[smx->nSmooth-1];
-	c = smx->kd->kdNodes;
-	p = smx->kd->p;
 	nSmooth = smx->nSmooth;
 	/*
 	 ** Initialize Priority Queue.
@@ -324,6 +323,7 @@ void smSmooth(SMX smx,void (*fncSmooth)(SMX,int,int,int *,float *))
 			}
 		smBallSearch(smx,smx->pqHead->fKey,p[pi].r);
 		smx->pfBall2[pi] = smx->pqHead->fKey;
+		p[pi].fSmooth = 0.5*sqrt(smx->pfBall2[pi]);
 		/*
 		 ** Pick next particle, 'pin'.
 		 ** Create fList and pList for function 'fncSmooth'.
@@ -1019,7 +1019,7 @@ void smOutHsmooth(SMX smx,FILE *fp)
 	for (i=0;i<smx->kd->nGas;++i) {
 		if (smx->kd->bGas) {
 			if (smx->kd->p[iCnt].iMark) {
-				fprintf(fp,"%.8g\n",0.5*sqrt(smx->pfBall2[iCnt]));
+				fprintf(fp,"%.8g\n",smx->kd->p[iCnt].fSmooth);
 				}
 			else fprintf(fp,"0\n");
 			++iCnt;
@@ -1029,7 +1029,7 @@ void smOutHsmooth(SMX smx,FILE *fp)
 	for (i=0;i<smx->kd->nDark;++i) {
 		if (smx->kd->bDark) {
 			if (smx->kd->p[iCnt].iMark) {
-				fprintf(fp,"%.8g\n",0.5*sqrt(smx->pfBall2[iCnt]));
+				fprintf(fp,"%.8g\n",smx->kd->p[iCnt].fSmooth);
 				}
 			else fprintf(fp,"0\n");
 			++iCnt;
@@ -1039,7 +1039,7 @@ void smOutHsmooth(SMX smx,FILE *fp)
 	for (i=0;i<smx->kd->nStar;++i) {
 		if (smx->kd->bStar) {
 			if (smx->kd->p[iCnt].iMark) {
-				fprintf(fp,"%.8g\n",0.5*sqrt(smx->pfBall2[iCnt]));
+				fprintf(fp,"%.8g\n",smx->kd->p[iCnt].fSmooth);
 				}
 			else fprintf(fp,"0\n");
 			++iCnt;
