@@ -126,6 +126,11 @@ int kdReadTipsy(KD kd,FILE *fp,int bNative,int bDark,int bGas,int bStar)
 		fprintf(stderr,"Error reading header from input file.\n");
 		exit(1);
 		}
+	if(h.nbodies < 0 || h.ndark < 0 || h.nsph < 0 || h.nstar < 0) {
+		fprintf(stderr, "Negative numbers of particles:\n");
+		fprintf(stderr, "Perhaps the file format is wrong?\n");
+		exit(1);
+		}
 	kd->nParticles = h.nbodies;
 	kd->nDark = h.ndark;
 	kd->nGas = h.nsph;
